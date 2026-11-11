@@ -177,7 +177,6 @@ Tests clear application data only in `checkout_test`. CI runs the backend suite 
 - [PostgreSQL locking](https://www.postgresql.org/docs/current/explicit-locking.html)
 - [Stripe idempotency](https://docs.stripe.com/api/idempotent_requests) and [webhook delivery](https://docs.stripe.com/webhooks) as design references, not our mock's exact contract
 - [Product decisions and UX sources](docs/PRODUCT_DECISIONS.md)
-- [Interview checkpoints](docs/INTERVIEW.md)
 
 This repository contains a local interview demo. Included bearer tokens, webhook signing secret and database password are deliberately non-production defaults; no real payment credentials are required.
 

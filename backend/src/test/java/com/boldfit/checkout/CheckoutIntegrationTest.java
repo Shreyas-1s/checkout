@@ -542,8 +542,9 @@ class CheckoutIntegrationTest {
     assertThat(fetched.getBody().attempts().get(0).createdAt()).isNotNull();
   }
 
-  @Test
-  void callbackExhaustionIsBoundedAndOperatorCanRecover() throws Exception {
+  @ParameterizedTest
+  @ValueSource(ints = {123456000, 123456499, 123456500, 999999999})
+  void callbackExhaustionIsBoundedAndOperatorCanRecover(int approvalNanos) throws Exception {
     UUID order = order("alex", "recovery-order"), attempt = attempt(order, "recovery-attempt");
     service.simulate("alex", attempt, "SUCCEEDED");
     for (int i = 0; i < 7; i++) jobs.recordFailure(attempt, "HTTP_503");
@@ -557,7 +558,13 @@ class CheckoutIntegrationTest {
         .isTrue();
     String path = "/api/ops/agent-actions/retry-failed-payment";
     UUID actionId = UUID.randomUUID();
-    String approvedAt = Instant.now().toString();
+    // Exercise exact microseconds, both sides of JDBC rounding, and a second rollover.
+    String approvedAt =
+        Instant.now()
+            .minusSeconds(1)
+            .truncatedTo(java.time.temporal.ChronoUnit.SECONDS)
+            .plusNanos(approvalNanos)
+            .toString();
     var action =
         Map.of(
             "actionId",
@@ -598,6 +605,19 @@ class CheckoutIntegrationTest {
         .isEqualTo(200);
     assertThat(mutation("demo-operator", path, action, null).getStatusCode().value())
         .isEqualTo(200);
+    assertThat(
+            db.queryForObject(
+                    "SELECT approved_at FROM agent_action_audit WHERE action_id=?",
+                    java.sql.Timestamp.class,
+                    actionId)
+                .toInstant())
+        .isEqualTo(Instant.parse(approvedAt).truncatedTo(java.time.temporal.ChronoUnit.MICROS));
+    var changedAction = new HashMap<String, Object>(action);
+    changedAction.put("approvedAt", Instant.parse(approvedAt).plusSeconds(1).toString());
+    var changedResponse = mutation("demo-operator", path, changedAction, null);
+    assertThat(changedResponse.getStatusCode().value()).isEqualTo(409);
+    assertThat(json.readTree(changedResponse.getBody()).path("code").asText())
+        .isEqualTo("ACTION_ID_REUSED");
     assertThat(
             db.queryForObject(
                 "SELECT retries FROM mock_delivery WHERE attempt_id=?", Integer.class, attempt))

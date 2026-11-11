@@ -36,6 +36,9 @@ public class RecoveryServiceImpl implements RecoveryService {
           "HUMAN_APPROVAL_REQUIRED",
           "A human must approve this retry action before it can execute.");
     Instant now = Instant.now();
+    // PostgreSQL stores microseconds. Normalize before binding so JDBC cannot round
+    // nanoseconds differently from the comparison used for an identical replay.
+    Instant approvedAt = input.approvedAt().truncatedTo(ChronoUnit.MICROS);
     if (input.approvedAt().isAfter(now.plusSeconds(300))
         || input.approvedAt().isBefore(now.minus(Duration.ofHours(24))))
       throw new ApiException(
@@ -55,10 +58,7 @@ public class RecoveryServiceImpl implements RecoveryService {
               && input.reason().equals(saved.reason())
               && input.approvalStatus().equals(saved.approvalStatus())
               && input.approvedBy().equals(saved.approvedBy())
-              && input
-                  .approvedAt()
-                  .truncatedTo(ChronoUnit.MICROS)
-                  .equals(saved.approvedAt().truncatedTo(ChronoUnit.MICROS));
+              && approvedAt.equals(saved.approvedAt());
       if (!same)
         throw new ApiException(
             409, "ACTION_ID_REUSED", "Action ID was already used for a different request.");
@@ -78,7 +78,7 @@ public class RecoveryServiceImpl implements RecoveryService {
         input.reason(),
         input.approvalStatus(),
         input.approvedBy(),
-        java.sql.Timestamp.from(input.approvedAt()),
+        java.sql.Timestamp.from(approvedAt),
         operator);
     return new PaymentStatus("QUEUED");
   }

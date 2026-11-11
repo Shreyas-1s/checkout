@@ -49,6 +49,8 @@ Callback delivery stops after five failures (backoff 5, 10, 20, 40 seconds). Ord
 
 The agent-action body is deliberately plain JSON:
 
+Approval timestamps are normalized to microsecond precision before storage and replay comparison, matching PostgreSQL. Replaying the same action does not depend on the submitting runtime's clock precision.
+
 ```json
 {
   "actionId": "b77e1a51-1ab6-43d0-89a6-591ea7360674",

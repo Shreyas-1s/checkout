@@ -313,24 +313,6 @@ p {
   color: #81916d;
   margin-top: 8px;
 }
-.bag-banner {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  background: #eaf0df;
-  padding: 23px;
-  margin-top: 30px;
-  font-size: 12px;
-}
-.bag-banner > div,
-.bag-banner a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.bag-banner a {
-  font-weight: 700;
-}
 .values {
   display: flex;
   justify-content: space-between;
@@ -808,11 +790,6 @@ footer small {
   .product-image .art {
     padding: 20px 0 5px;
   }
-  .bag-banner {
-    flex-direction: column;
-    padding: 18px;
-    font-size: 11px;
-  }
   .values {
     gap: 18px;
     align-items: flex-start;
@@ -1098,5 +1075,79 @@ footer small {
   .payment-method {
     padding: 12px;
     gap: 10px;
+  }
+}
+
+.cart-nudge {
+  position: fixed;
+  z-index: 30;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, calc(100% - 32px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 16px 14px 20px;
+  background: #fafbf7;
+  border: 1px solid #d6dfcb;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px #183b2b26;
+}
+.cart-nudge-details {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+.cart-nudge-details strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+}
+.cart-nudge-details span {
+  display: block;
+  font-size: 12px;
+  color: #68795b;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.cart-nudge a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  min-height: 44px;
+  padding: 0 20px;
+  background: #204630;
+  color: #fff;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cart-nudge a:hover {
+  background: #315e40;
+}
+.cart-nudge-space {
+  height: calc(100px + env(safe-area-inset-bottom));
+}
+@media (max-width: 600px) {
+  .cart-nudge {
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    width: calc(100% - 24px);
+    padding: 12px;
+    gap: 10px;
+  }
+  .cart-nudge-details {
+    gap: 9px;
+  }
+  .cart-nudge-details strong {
+    font-size: 12px;
+  }
+  .cart-nudge a {
+    padding: 0 15px;
+    gap: 9px;
   }
 }

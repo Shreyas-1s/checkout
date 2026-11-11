@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   ArrowRight,
   Check,
@@ -8,12 +7,14 @@ import {
   LockKeyhole,
   Smartphone,
 } from "lucide-react";
+import { useState } from "react";
 
-export type PaymentMethod = "UPI" | "CARD" | "NETBANKING";
+import type { PaymentMethod } from "../../shared/api/contracts";
 type Props = {
   amount: string;
   busy: boolean;
   submitted: boolean;
+  exhausted?: boolean;
   onPay: (method: PaymentMethod) => void;
 };
 const methods = [
@@ -36,7 +37,13 @@ const methods = [
     icon: Landmark,
   },
 ];
-export default function MockPayment({ amount, busy, submitted, onPay }: Props) {
+export default function MockPayment({
+  amount,
+  busy,
+  submitted,
+  exhausted = false,
+  onPay,
+}: Props) {
   const [method, setMethod] = useState<PaymentMethod>("UPI");
   return (
     <section className="payment-provider" aria-label="Mock payment provider">
@@ -51,11 +58,16 @@ export default function MockPayment({ amount, busy, submitted, onPay }: Props) {
       </div>
       {submitted ? (
         <div className="payment-processing" role="status">
-          <LoaderCircle className="payment-spinner" size={30} />
-          <h3>Confirming your payment</h3>
+          {!exhausted && <LoaderCircle className="payment-spinner" size={30} />}
+          <h3>
+            {exhausted
+              ? "Confirmation needs attention"
+              : "Confirming your payment"}
+          </h3>
           <p>
-            Your payment was submitted. You can leave this page and return to
-            your order. Please don’t pay again.
+            {exhausted
+              ? "Automatic confirmation retries have stopped. This payment needs operator attention. Please don’t pay again."
+              : "Your payment was submitted. You can leave this page and return to your order. Please don’t pay again."}
           </p>
           <div className="payment-progress">
             <span>

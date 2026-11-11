@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://boldfit.local/schemas/retry-failed-payment.schema.json",
+  "title": "Retry failed payment agent action",
+  "description": "An internal agent may prepare this action, but the API executes it only after a human has approved it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "actionId",
+    "action",
+    "orderId",
+    "paymentAttemptId",
+    "reason",
+    "approvalStatus",
+    "approvedBy",
+    "approvedAt"
+  ],
+  "properties": {
+    "actionId": { "type": "string", "format": "uuid" },
+    "action": { "const": "RETRY_FAILED_PAYMENT" },
+    "orderId": { "type": "string", "format": "uuid" },
+    "paymentAttemptId": { "type": "string", "format": "uuid" },
+    "reason": { "type": "string", "minLength": 10, "maxLength": 500 },
+    "approvalStatus": { "const": "APPROVED" },
+    "approvedBy": { "type": "string", "minLength": 3, "maxLength": 200 },
+    "approvedAt": { "type": "string", "format": "date-time" }
+  }
+}

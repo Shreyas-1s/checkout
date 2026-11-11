@@ -1,4 +1,4 @@
-# Boldfit checkout slice
+# Checkout slice
 
 Five products, a cart, stock-safe checkout, a local payment provider (FitPay), a signed webhook, and customer order status. Java 17 / Spring Boot 3.5, PostgreSQL 17 with Flyway, React / TypeScript / Vite. No external payment account or credentials required.
 
